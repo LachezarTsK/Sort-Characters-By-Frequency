@@ -3,51 +3,30 @@ import java.util.Arrays;
 
 public class Solution {
 
-    public final int TOTAL_ASCII_CHARS_FROM_ZERO_CHAR_TO_LOWERCASE_Z = 75;
-    public Letter[] frequency;
-
-    public String frequencySort(String s) {
-        initializeFrequency();
-        recordFrequency(s);
-        return createStringInDecreasingOrderOfCharFrequency();
+    private final class CharacterData {
+        int frequency = 0;
+        char character = '\u0000';
     }
 
-    public void initializeFrequency() {
-        frequency = new Letter[TOTAL_ASCII_CHARS_FROM_ZERO_CHAR_TO_LOWERCASE_Z];
-        int n = frequency.length;
-        for (int i = 0; i < n; i++) {
-            frequency[i] = new Letter();
+    private static final int ASCII_CONTROL_AND_PRINTABLE_CHARACTERS_SIZE = 128;
+
+    public String frequencySort(String input) {
+        CharacterData[] data = new CharacterData[ASCII_CONTROL_AND_PRINTABLE_CHARACTERS_SIZE];
+        for (int i = 0; i < data.length; ++i) {
+            data[i] = new CharacterData();
         }
-    }
-
-    public void recordFrequency(String s) {
-        int n = s.length();
-        for (int i = 0; i < n; i++) {
-            int index = s.charAt(i) - '0';
-            frequency[index].frequency++;
-            frequency[index].index = index;
+        for (int i = 0; i < input.length(); ++i) {
+            data[input.charAt(i)].character = input.charAt(i);
+            ++data[input.charAt(i)].frequency;
         }
-    }
 
-    public String createStringInDecreasingOrderOfCharFrequency() {
-
-        Arrays.sort(frequency, (x, y) -> y.frequency - x.frequency);
-        StringBuilder decreasingCharFrequency = new StringBuilder();
-        int n = frequency.length;
-
-        for (int i = 0; i < n && frequency[i].frequency > 0; i++) {
-            int numberOfChars = frequency[i].frequency;
-            while (numberOfChars-- > 0) {
-                decreasingCharFrequency.append((char) ('0' + frequency[i].index));
+        Arrays.sort(data, (x, y) -> y.frequency - x.frequency);
+        StringBuilder charactersByDescendingFrequency = new StringBuilder();
+        for (CharacterData current : data) {
+            while (current.frequency-- > 0) {
+                charactersByDescendingFrequency.append(current.character);
             }
         }
-
-        return decreasingCharFrequency.toString();
+        return charactersByDescendingFrequency.toString();
     }
-}
-
-class Letter {
-
-    int frequency;
-    int index;
 }
