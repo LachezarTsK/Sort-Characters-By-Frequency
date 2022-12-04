@@ -1,47 +1,31 @@
 
-const TOTAL_ASCII_CHARS_FROM_ZERO_CHAR_TO_LOWERCASE_Z = 75;
-const CODE_POINT_ASCII_ZERO_CHAR = 48;
-var frequency;
-
 /**
- * @param {string} s
+ * @param {string} input
  * @return {string}
  */
-var frequencySort = function (s) {
-    frequency = [];
-    for (let i = 0; i < TOTAL_ASCII_CHARS_FROM_ZERO_CHAR_TO_LOWERCASE_Z; i++) {
-        frequency[i] = [0, i];
+var frequencySort = function (input) {
+    const ASCII_CONTROL_AND_PRINTABLE_CHARACTERS_SIZE = 128;
+    const data = new Array(ASCII_CONTROL_AND_PRINTABLE_CHARACTERS_SIZE);
+
+    for (let i = 0; i < data.length; ++i) {
+        data[i] = new CharacterData();
     }
-    recordFrequency(s);
-    return createStringInDecreasingOrderOfCharFrequency();
-};
-
-/**
- * @param {string} s
- */
-function recordFrequency(s) {
-    let n = s.length;
-    for (let i = 0; i < n; i++) {
-        let index = s.codePointAt(i) - CODE_POINT_ASCII_ZERO_CHAR;
-        frequency[index][0]++;
+    for (let i = 0; i < input.length; ++i) {
+        data[input.codePointAt(i)].character = input.charAt(i);
+        ++data[input.codePointAt(i)].frequency;
     }
-}
 
-/**
- * @return {string}
- */
-function createStringInDecreasingOrderOfCharFrequency() {
-
-    frequency.sort((x, y) => y[0] - x[0]);
-    let decreasingCharFrequency = "";
-    let n = frequency.length;
-
-    for (let i = 0; i < n && frequency[i][0] > 0; i++) {
-        let numberOfChars = frequency[i][0];
-        while (numberOfChars-- > 0) {
-            decreasingCharFrequency += String.fromCodePoint(CODE_POINT_ASCII_ZERO_CHAR + frequency[i][1]);
+    data.sort((x, y) => y.frequency - x.frequency);
+    const charactersByDescendingFrequency = [];
+    for (let current of data) {
+        while (current.frequency-- > 0) {
+            charactersByDescendingFrequency.push(current.character);
         }
     }
+    return charactersByDescendingFrequency.join('');
+};
 
-    return decreasingCharFrequency;
+function  CharacterData() {
+    this.frequency = 0;
+    this.character = '\u0000';
 }
